@@ -1,2 +1,2 @@
 # advent-of-code-2022
-Advent of Code 2017 in Rust
+Using [Advent of Code 2022](https://adventofcode.com/2022) as a chance to learn Rust.
