@@ -36,22 +36,44 @@ fn first_half(lines: std::str::Lines) {
         points += round_pts;
         points += my_move as u32;
 
-        println!("{} vs {} => {} + {}", opponent_move, my_move, round_pts, my_move);
+//        println!("{} vs {} => {} + {}", opponent_move, my_move, round_pts, my_move);
     }
 
     println!("1) Total points {}", points);
 }
 
+const LOSE: u8 = 'X' as u8;
+const WIN: u8 = 'Z' as u8;
 
-// fn second_half(file: &File) -> std::io::Result<()> {
 
-//     let reader = BufReader::new(file);
+fn choose_my_move(opponent_move: u8, expected_result: u8) -> u8 {
 
-//     for line in reader.lines() {
+    // X means you need to lose, Y means you need to end the round in a draw, and Z means you need to win
+    return match expected_result {
+        LOSE => (opponent_move + 1) % 3 + 1,
+        WIN => (opponent_move) % 3 + 1,
+        _ => opponent_move
+    };
+}
 
-//     }
-//     Ok(())
-// }
+fn second_half(lines: std::str::Lines) {
+
+    let mut points: u32 = 0;
+
+    for line in lines {
+        let bytes = line.as_bytes();
+        let opponent_move: u8 = bytes[0] - A + 1;
+        let my_move: u8 = choose_my_move(opponent_move, bytes[2]);
+
+        let round_pts = game_points(opponent_move, my_move);
+        points += round_pts;
+        points += my_move as u32;
+
+        println!("{} vs {} => {} + {}", opponent_move, my_move, round_pts, my_move);
+    }
+
+    println!("2) Total points {}", points);
+}
 
 fn main() -> std::io::Result<()> {
 
@@ -63,11 +85,10 @@ fn main() -> std::io::Result<()> {
 
     // let it = "A Y\nB X\nC Z".lines();
     let file_content = fs::read_to_string(filename)?;
-    let it = file_content.lines();
-    first_half(it);
+    first_half(file_content.lines());
 
-    // file.rewind()?;
-    // second_half(&file)?;
+    //second_half("A Y\nB X\nC Z".lines());
+    second_half(file_content.lines());
 
     Ok(())
 }
