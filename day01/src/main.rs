@@ -64,14 +64,11 @@ fn main() -> std::io::Result<()> {
     let filename: &String = &args[1];
     println!("\nIncoming path: {}", filename);
 
-    let file_content = fs::read_to_string(filename)?;
-    let lines: Vec<&str> = file_content.lines().collect();
+    let content = fs::read_to_string(filename)?;
+    let lines: Vec<&str> = content.lines().collect();
 
-
--   first_half(&lines);
-
+    first_half(&lines);
     second_half(&lines);
 
     Ok(())
 }
-

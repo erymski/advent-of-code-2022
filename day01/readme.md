@@ -55,4 +55,4 @@ Find the top three Elves carrying the most Calories. How many Calories are those
 
 ## Run
 
-`cargo run .\day01\src\1.txt`
+`cargo run .\day01\data\input.txt`
