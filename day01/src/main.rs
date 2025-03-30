@@ -1,22 +1,17 @@
-use std::fs::File;
+use std::fs;
 use std::env;
-use std::io::{BufReader, BufRead, Seek};
 
 // find result in a *single* pass:
 //   go line by line.  Detect Elf changes.  Track the one with the biggest sum.
-fn first_half(file: &File) -> std::io::Result<()> {
+fn first_half(lines: &Vec<&str>) {
 
-    let reader: BufReader<&File> = BufReader::new(file);
-    
     let mut curr_sum: i32 = 0;
     let mut curr_index: i32 = 0;
     let mut biggest_index: i32 = -1;
     let mut biggest_sum: i32 = -1;
 
+    for line in lines {
 
-    for res in reader.lines() {
-
-        let line: String = res?;
         if line.is_empty() {
 
             if curr_sum > biggest_sum {
@@ -28,33 +23,28 @@ fn first_half(file: &File) -> std::io::Result<()> {
             curr_index += 1;
         } else {
 
-            curr_sum += str::parse::<i32>(line.as_str()).unwrap();
+            curr_sum += str::parse::<i32>(line).unwrap();
         }
     }
 
     println!("1) Found: index: {}, sum: {}", biggest_index, biggest_sum);
 
-    Ok(())
-
 }
 
-fn second_half(file: &File) -> std::io::Result<()> {
+fn second_half(lines: &Vec<&str>) {
 
     let mut vec: Vec<i32> = vec![0];
     let mut index: usize = 0;
 
-    let reader: BufReader<&File> = BufReader::new(file);
-
     // make array with sums
-    for res in reader.lines() {
+    for line in lines {
 
-        let line = res?;
         if line.is_empty() {
             index += 1;
             vec.push(0);
         }
         else {
-            vec[index] += str::parse::<i32>(line.as_str()).unwrap();
+            vec[index] += str::parse::<i32>(line).unwrap();
         }
     }
 
@@ -64,21 +54,23 @@ fn second_half(file: &File) -> std::io::Result<()> {
     let res: i32 = last3.iter().sum();
 
     println!("2) Sum of top three: {}", res);
-
-    Ok(())
 }
 
 fn main() -> std::io::Result<()> {
 
     let args: Vec<String> = env::args().collect();
+    if args.len() < 2 { panic!("Not enough command line arguments"); }
+
     let filename: &String = &args[1];
     println!("\nIncoming path: {}", filename);
 
-    let mut file = File::open(filename)?;
-    first_half(&file)?;
+    let file_content = fs::read_to_string(filename)?;
+    let lines: Vec<&str> = file_content.lines().collect();
 
-    file.rewind()?;
-    second_half(&file)?;
+
+-   first_half(&lines);
+
+    second_half(&lines);
 
     Ok(())
 }
