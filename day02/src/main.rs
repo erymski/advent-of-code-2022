@@ -97,3 +97,23 @@ fn main() -> std::io::Result<()> {
 
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+
+    #[test]
+    fn test_first_half() {
+        let lines = "A Y\nB X\nC Z".lines().collect();
+        let points: u32 = first_half(&lines);
+        assert_eq!(points, 15)
+    }
+
+    #[test]
+    fn test_second_half() {
+        let lines = "A Y\nB X\nC Z".lines().collect();
+        let points: u32 = second_half(&lines);
+        assert_eq!(points, 12)
+    }
+}
