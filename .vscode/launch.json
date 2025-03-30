@@ -7,7 +7,7 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'day01'",
+            "name": "Debug day01",
             "cargo": {
                 "args": [
                     "build",
@@ -25,26 +25,7 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'day01'",
-            "cargo": {
-                "args": [
-                    "test",
-                    "--no-run",
-                    "--bin=day01",
-                    "--package=day01"
-                ],
-                "filter": {
-                    "name": "day01",
-                    "kind": "bin"
-                }
-            },
-            "args": [],
-            "cwd": "${workspaceFolder}"
-        },
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "Debug executable 'day02'",
+            "name": "Debug day02",
             "cargo": {
                 "args": [
                     "build",
@@ -56,26 +37,7 @@
                     "kind": "bin"
                 }
             },
-            "args": [],
-            "cwd": "${workspaceFolder}"
-        },
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "Debug unit tests in executable 'day02'",
-            "cargo": {
-                "args": [
-                    "test",
-                    "--no-run",
-                    "--bin=day02",
-                    "--package=day02"
-                ],
-                "filter": {
-                    "name": "day02",
-                    "kind": "bin"
-                }
-            },
-            "args": [],
+            "args": ["${workspaceFolder}/day02/data/input.txt"],
             "cwd": "${workspaceFolder}"
         }
     ]

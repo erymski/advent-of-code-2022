@@ -23,7 +23,7 @@ fn game_points(opponent_move: u8, my_move: u8) -> u32 {
     }
 }
 
-fn first_half(lines: std::str::Lines) {
+fn first_half(lines: &Vec<&str>) {
 
     let mut points: u32 = 0;
 
@@ -56,7 +56,7 @@ fn choose_my_move(opponent_move: u8, expected_result: u8) -> u8 {
     };
 }
 
-fn second_half(lines: std::str::Lines) {
+fn second_half(lines: &Vec<&str>) {
 
     let mut points: u32 = 0;
 
@@ -69,7 +69,7 @@ fn second_half(lines: std::str::Lines) {
         points += round_pts;
         points += my_move as u32;
 
-        println!("{} vs {} => {} + {}", opponent_move, my_move, round_pts, my_move);
+//        println!("{} vs {} => {} + {}", opponent_move, my_move, round_pts, my_move);
     }
 
     println!("2) Total points {}", points);
@@ -78,17 +78,19 @@ fn second_half(lines: std::str::Lines) {
 fn main() -> std::io::Result<()> {
 
     let args: Vec<String> = env::args().collect();
-    if args.len() < 2 { panic!("Not enough command line parameters"); }
+    if args.len() < 2 { panic!("Not enough command line arguments"); }
 
     let filename: &String = &args[1];
     println!("\nIncoming path: {}", filename);
 
+    let content = fs::read_to_string(filename)?;
+    let lines: Vec<&str> = content.lines().collect();
+
     // let it = "A Y\nB X\nC Z".lines();
-    let file_content = fs::read_to_string(filename)?;
-    first_half(file_content.lines());
+    first_half(&lines);
 
     //second_half("A Y\nB X\nC Z".lines());
-    second_half(file_content.lines());
+    second_half(&lines);
 
     Ok(())
 }
