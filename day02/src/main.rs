@@ -23,7 +23,7 @@ fn game_points(opponent_move: u8, my_move: u8) -> u32 {
     }
 }
 
-fn first_half(lines: &Vec<&str>) {
+fn first_half(lines: &Vec<&str>) -> u32 {
 
     let mut points: u32 = 0;
 
@@ -39,7 +39,7 @@ fn first_half(lines: &Vec<&str>) {
 //        println!("{} vs {} => {} + {}", opponent_move, my_move, round_pts, my_move);
     }
 
-    println!("1) Total points {}", points);
+    return points;
 }
 
 const LOSE: u8 = 'X' as u8;
@@ -56,7 +56,7 @@ fn choose_my_move(opponent_move: u8, expected_result: u8) -> u8 {
     };
 }
 
-fn second_half(lines: &Vec<&str>) {
+fn second_half(lines: &Vec<&str>) -> u32 {
 
     let mut points: u32 = 0;
 
@@ -72,7 +72,7 @@ fn second_half(lines: &Vec<&str>) {
 //        println!("{} vs {} => {} + {}", opponent_move, my_move, round_pts, my_move);
     }
 
-    println!("2) Total points {}", points);
+    return points;
 }
 
 fn main() -> std::io::Result<()> {
@@ -87,10 +87,13 @@ fn main() -> std::io::Result<()> {
     let lines: Vec<&str> = content.lines().collect();
 
     // let it = "A Y\nB X\nC Z".lines();
-    first_half(&lines);
+    let pts1: u32 = first_half(&lines);
+    println!("1) Total points {}", pts1);
 
     //second_half("A Y\nB X\nC Z".lines());
-    second_half(&lines);
+    let pts2: u32 = second_half(&lines);
+    println!("2) Total points {}", pts2);
+
 
     Ok(())
 }
