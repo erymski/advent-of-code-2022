@@ -6,7 +6,7 @@ use std::io::{BufReader, BufRead, Seek};
 //   go line by line.  Detect Elf changes.  Track the one with the biggest sum.
 fn first_half(file: &File) -> std::io::Result<()> {
 
-    let reader = BufReader::new(file);
+    let reader: BufReader<&File> = BufReader::new(file);
     
     let mut curr_sum: i32 = 0;
     let mut curr_index: i32 = 0;
@@ -14,9 +14,9 @@ fn first_half(file: &File) -> std::io::Result<()> {
     let mut biggest_sum: i32 = -1;
 
 
-    for line in reader.lines() {
+    for res in reader.lines() {
 
-        let line = line?;
+        let line: String = res?;
         if line.is_empty() {
 
             if curr_sum > biggest_sum {
@@ -40,15 +40,15 @@ fn first_half(file: &File) -> std::io::Result<()> {
 
 fn second_half(file: &File) -> std::io::Result<()> {
 
-    let mut vec = vec![0];
-    let mut index = 0;
+    let mut vec: Vec<i32> = vec![0];
+    let mut index: usize = 0;
 
-    let reader = BufReader::new(file);
+    let reader: BufReader<&File> = BufReader::new(file);
 
     // make array with sums
-    for line in reader.lines() {
+    for res in reader.lines() {
 
-        let line = line?;
+        let line = res?;
         if line.is_empty() {
             index += 1;
             vec.push(0);
