@@ -1,6 +1,7 @@
 use std::fs;
 use std::env;
 use std::collections::HashSet;
+use std::collections::HashMap;
 
 /// Find common char in both halves of the string
 fn find_shared(line: &str) -> Option<char> {
@@ -34,6 +35,31 @@ fn to_number(ch: char) -> u8 {
     if as_byte >= A_LOW { as_byte - A_LOW + 1 } else { as_byte - A_UPPER + 27 }
 }
 
+fn get_badge_letter(lines: &Vec<&str>) -> Option<char> {
+
+    let mut chars_count: HashMap<char, u8> = HashMap::new();
+
+    let mut bit = 1;
+    for line in lines {
+
+        let trimmed = line.trim();
+        if trimmed.is_empty() { continue; }
+
+        for ch in trimmed.chars() {
+            let stat = chars_count.entry(ch).or_insert(0);
+            *stat |= bit;
+        }
+
+        bit <<= 1;
+    }
+
+    for (ch, bits) in chars_count {
+        if bits == 0b111 { return Some(ch) } // expecting three lines
+    }
+
+    return None
+}
+
 /// Solve first part of the day 3
 fn first_part(lines: &Vec<&str>) -> u32 {
 
@@ -41,7 +67,7 @@ fn first_part(lines: &Vec<&str>) -> u32 {
     for line in lines {
 
         if line.is_empty() { continue }
-        
+
         let shared = find_shared(line);
         if shared.is_some() {
             sum += to_number(shared.unwrap()) as u32
@@ -66,7 +92,6 @@ fn main() -> std::io::Result<()> {
 
     let sum: u32 = first_part(&lines);
     println!("1) The sum is {}", sum);
-
 
     Ok(())
 }
@@ -98,5 +123,24 @@ mod tests {
         assert_eq!(to_number('v'), 22);
         assert_eq!(to_number('t'), 20);
         assert_eq!(to_number('s'), 19);
+    }
+
+    #[test]
+    fn get_badge() {
+        let input1 = r#"
+                            vJrwpWtwJgWrhcsFMMfFFhFp
+                            jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
+                            PmmdzqPrVvPwwTWBwg
+                            "#;
+
+        assert_eq!(get_badge_letter(&input1.lines().collect()), Some('r'));
+
+        let input2 = r#"
+                            wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
+                            ttgJtRGJQctTZtZT
+                            CrZsJsPPZsGzwwsLwLmpwMDw
+                            "#;
+        assert_eq!(get_badge_letter(&input2.lines().collect()), Some('Z'));
+
     }
 }
