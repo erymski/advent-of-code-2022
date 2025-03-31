@@ -2,6 +2,7 @@ use std::fs;
 use std::env;
 use std::collections::HashSet;
 
+/// Find common char in both halves of the string
 fn find_shared(line: &str) -> Option<char> {
 
     let len: usize = line.len();
@@ -21,12 +22,35 @@ fn find_shared(line: &str) -> Option<char> {
     return None;
 }
 
-const A_LOW: u8 = 'a' as u8;
-const A_UPPER: u8 = 'A' as u8;
-
+/// Convert character to corresponding priority
 fn to_number(ch: char) -> u8 {
+
+    const A_LOW: u8 = 'a' as u8;
+    const A_UPPER: u8 = 'A' as u8;
+
+    // Lowercase item types a through z have priorities 1 through 26.
+    // Uppercase item types A through Z have priorities 27 through 52.
     let as_byte = ch as u8;
-    if as_byte >= A_LOW {as_byte - A_LOW + 1} else { as_byte - A_UPPER + 27 }
+    if as_byte >= A_LOW { as_byte - A_LOW + 1 } else { as_byte - A_UPPER + 27 }
+}
+
+/// Solve first part of the day 3
+fn first_part(lines: &Vec<&str>) -> u32 {
+
+    let mut sum: u32 = 0;
+    for line in lines {
+
+        if line.is_empty() { continue }
+        
+        let shared = find_shared(line);
+        if shared.is_some() {
+            sum += to_number(shared.unwrap()) as u32
+        } else {
+            debug_assert!(true)
+        }
+    }
+
+    return sum;
 }
 
 fn main() -> std::io::Result<()> {
@@ -40,19 +64,7 @@ fn main() -> std::io::Result<()> {
     let content = fs::read_to_string(filename)?;
     let lines: Vec<&str> = content.lines().collect();
 
-    let mut sum: u32 = 0;
-    for line in &lines {
-
-        if line.is_empty() {
-
-        } else {
-            let shared = find_shared(line);
-            if shared.is_some() {
-                sum += to_number(shared.unwrap()) as u32
-            }
-        }
-    }
-
+    let sum: u32 = first_part(&lines);
     println!("1) The sum is {}", sum);
 
 
@@ -64,7 +76,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_find_shared_success() {
+    fn find_shared_success() {
         assert_eq!(find_shared("vJrwpWtwJgWrhcsFMMfFFhFp"), Some('p'));
         assert_eq!(find_shared("jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL"), Some('L'));
         assert_eq!(find_shared("PmmdzqPrVvPwwTWBwg"), Some('P'));
@@ -73,13 +85,13 @@ mod tests {
     }
 
     #[test]
-    fn test_find_shared_failure() {
+    fn find_shared_failure() {
         assert_eq!(find_shared("line"), None);
         assert_eq!(find_shared(""), None);
     }
 
     #[test]
-    fn test_to_char() {
+    fn to_number_conversion() {
         assert_eq!(to_number('p'), 16);
         assert_eq!(to_number('L'), 38);
         assert_eq!(to_number('P'), 42);
