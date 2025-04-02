@@ -35,7 +35,7 @@ fn to_number(ch: char) -> u8 {
     if as_byte >= A_LOW { as_byte - A_LOW + 1 } else { as_byte - A_UPPER + 27 }
 }
 
-fn get_badge_letter(lines: &Vec<&str>) -> Option<char> {
+fn get_badge_letter(lines: &[&str]) -> Option<char> { // TODO: can it be iterator over strings?
 
     let mut chars_count: HashMap<char, u8> = HashMap::new();
 
@@ -79,6 +79,23 @@ fn first_part(lines: &Vec<&str>) -> u32 {
     return sum;
 }
 
+fn second_part(lines: &Vec<&str>) -> u32 {
+
+    let mut sum: u32 = 0;
+
+    for triple in lines.chunks(3) {
+
+        let letter = get_badge_letter(triple);
+        if letter.is_some() {
+            sum += to_number(letter.unwrap()) as u32;
+        } else {
+            debug_assert!(true)
+        }
+    }
+
+    return sum;
+}
+
 fn main() -> std::io::Result<()> {
 
     let args: Vec<String> = env::args().collect();
@@ -90,8 +107,11 @@ fn main() -> std::io::Result<()> {
     let content = fs::read_to_string(filename)?;
     let lines: Vec<&str> = content.lines().collect();
 
-    let sum: u32 = first_part(&lines);
-    println!("1) The sum is {}", sum);
+    let sum1: u32 = first_part(&lines);
+    println!("1) The sum is {}", sum1);
+
+    let sum2: u32 = second_part(&lines);
+    println!("2) The sum is {}", sum2);
 
     Ok(())
 }
