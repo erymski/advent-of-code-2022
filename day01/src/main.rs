@@ -1,5 +1,4 @@
-use std::fs;
-use std::env;
+use utils;
 
 // find result in a *single* pass:
 //   go line by line.  Detect Elf changes.  Track the one with the biggest sum.
@@ -58,13 +57,7 @@ fn second_half(lines: &Vec<&str>) {
 
 fn main() -> std::io::Result<()> {
 
-    let args: Vec<String> = env::args().collect();
-    if args.len() < 2 { panic!("Not enough command line arguments"); }
-
-    let filename: &String = &args[1];
-    println!("\nIncoming path: {}", filename);
-
-    let content = fs::read_to_string(filename)?;
+    let content = utils::load_data()?;
     let lines: Vec<&str> = content.lines().collect();
 
     first_half(&lines);

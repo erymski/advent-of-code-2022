@@ -1,5 +1,4 @@
-use std::fs;
-use std::env;
+use utils;
 
 const A: u8 = 'A' as u8;
 const X: u8 = 'X' as u8;
@@ -77,13 +76,7 @@ fn second_half(lines: &Vec<&str>) -> u32 {
 
 fn main() -> std::io::Result<()> {
 
-    let args: Vec<String> = env::args().collect();
-    if args.len() < 2 { panic!("Not enough command line arguments"); }
-
-    let filename: &String = &args[1];
-    println!("\nIncoming path: {}", filename);
-
-    let content = fs::read_to_string(filename)?;
+    let content = utils::load_data()?;
     let lines: Vec<&str> = content.lines().collect();
 
     // let it = "A Y\nB X\nC Z".lines();
