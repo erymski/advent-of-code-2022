@@ -147,20 +147,20 @@ mod tests {
 
     #[test]
     fn get_badge() {
-        let input1 = r#"
-                            vJrwpWtwJgWrhcsFMMfFFhFp
-                            jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
-                            PmmdzqPrVvPwwTWBwg
-                            "#;
+        let input1 = [
+                            "vJrwpWtwJgWrhcsFMMfFFhFp",
+                            "jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL",
+                            "PmmdzqPrVvPwwTWBwg",
+        ];
 
-        assert_eq!(get_badge_letter(&input1.lines().collect()), Some('r'));
+        assert_eq!(get_badge_letter(&input1), Some('r'));
 
-        let input2 = r#"
-                            wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
-                            ttgJtRGJQctTZtZT
-                            CrZsJsPPZsGzwwsLwLmpwMDw
-                            "#;
-        assert_eq!(get_badge_letter(&input2.lines().collect()), Some('Z'));
+        let input2 = [
+                            "wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn",
+                            "ttgJtRGJQctTZtZT",
+                            "CrZsJsPPZsGzwwsLwLmpwMDw",
+        ];
+        assert_eq!(get_badge_letter(&input2), Some('Z'));
 
     }
 }
