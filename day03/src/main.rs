@@ -1,12 +1,13 @@
-use utils;
-use std::collections::HashSet;
 use std::collections::HashMap;
+use std::collections::HashSet;
+use utils;
 
 /// Find common char in both halves of the string
 fn find_shared(line: &str) -> Option<char> {
-
     let len: usize = line.len();
-    if len == 0 { return None; }
+    if len == 0 {
+        return None;
+    }
 
     let (first, second) = line.split_at(len / 2);
 
@@ -16,7 +17,9 @@ fn find_shared(line: &str) -> Option<char> {
     }
 
     for ch in second.chars() {
-        if first_half_chars.contains(&ch) { return Some(ch); }
+        if first_half_chars.contains(&ch) {
+            return Some(ch);
+        }
     }
 
     return None;
@@ -24,25 +27,30 @@ fn find_shared(line: &str) -> Option<char> {
 
 /// Convert character to corresponding priority
 fn to_number(ch: char) -> u8 {
-
     const A_LOW: u8 = 'a' as u8;
     const A_UPPER: u8 = 'A' as u8;
 
     // Lowercase item types a through z have priorities 1 through 26.
     // Uppercase item types A through Z have priorities 27 through 52.
     let as_byte = ch as u8;
-    if as_byte >= A_LOW { as_byte - A_LOW + 1 } else { as_byte - A_UPPER + 27 }
+    if as_byte >= A_LOW {
+        as_byte - A_LOW + 1
+    } else {
+        as_byte - A_UPPER + 27
+    }
 }
 
-fn get_badge_letter(lines: &[&str]) -> Option<char> { // TODO: can it be iterator over strings?
+fn get_badge_letter(lines: &[&str]) -> Option<char> {
+    // TODO: can it be iterator over strings?
 
     let mut chars_count: HashMap<char, u8> = HashMap::new();
 
     let mut bit = 1;
     for line in lines {
-
         let trimmed = line.trim();
-        if trimmed.is_empty() { continue; }
+        if trimmed.is_empty() {
+            continue;
+        }
 
         for ch in trimmed.chars() {
             let stat = chars_count.entry(ch).or_insert(0);
@@ -53,19 +61,21 @@ fn get_badge_letter(lines: &[&str]) -> Option<char> { // TODO: can it be iterato
     }
 
     for (ch, bits) in chars_count {
-        if bits == 0b111 { return Some(ch) } // expecting three lines
+        if bits == 0b111 {
+            return Some(ch);
+        } // expecting three lines
     }
 
-    return None
+    return None;
 }
 
 /// Solve first part of the day 3
 fn first_part(lines: &Vec<&str>) -> u32 {
-
     let mut sum: u32 = 0;
     for line in lines {
-
-        if line.is_empty() { continue }
+        if line.is_empty() {
+            continue;
+        }
 
         let shared = find_shared(line);
         if shared.is_some() {
@@ -79,11 +89,9 @@ fn first_part(lines: &Vec<&str>) -> u32 {
 }
 
 fn second_part(lines: &Vec<&str>) -> u32 {
-
     let mut sum: u32 = 0;
 
     for triple in lines.chunks(3) {
-
         let letter = get_badge_letter(triple);
         if letter.is_some() {
             sum += to_number(letter.unwrap()) as u32;
@@ -96,7 +104,6 @@ fn second_part(lines: &Vec<&str>) -> u32 {
 }
 
 fn main() -> std::io::Result<()> {
-
     let content = utils::load_data()?;
     let lines: Vec<&str> = content.lines().collect();
 
@@ -141,19 +148,18 @@ mod tests {
     #[test]
     fn get_badge() {
         let input1 = [
-                            "vJrwpWtwJgWrhcsFMMfFFhFp",
-                            "jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL",
-                            "PmmdzqPrVvPwwTWBwg",
+            "vJrwpWtwJgWrhcsFMMfFFhFp",
+            "jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL",
+            "PmmdzqPrVvPwwTWBwg",
         ];
 
         assert_eq!(get_badge_letter(&input1), Some('r'));
 
         let input2 = [
-                            "wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn",
-                            "ttgJtRGJQctTZtZT",
-                            "CrZsJsPPZsGzwwsLwLmpwMDw",
+            "wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn",
+            "ttgJtRGJQctTZtZT",
+            "CrZsJsPPZsGzwwsLwLmpwMDw",
         ];
         assert_eq!(get_badge_letter(&input2), Some('Z'));
-
     }
 }
