@@ -75,6 +75,24 @@
             },
             "args": ["${workspaceFolder}/day04/data/input.txt"],
             "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug day05",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=day05",
+                    "--package=day05"
+                ],
+                "filter": {
+                    "name": "day05",
+                    "kind": "bin"
+                }
+            },
+            "args": ["${workspaceFolder}/day05/data/input.txt"],
+            "cwd": "${workspaceFolder}"
         }
     ]
 }
