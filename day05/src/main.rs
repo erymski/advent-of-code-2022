@@ -3,6 +3,37 @@ use utils;
 type Strings<'a> = Vec<&'a str>;
 type Stack = Vec<char>;
 
+use lazy_static::lazy_static;
+use regex::Regex;
+
+lazy_static! {
+    static ref MOVE_REGEX: Regex = Regex::new(r"move (\d*) from (\d*) to (\d*)").unwrap();
+}
+
+struct Move {
+    count: u8,
+    from: u8,
+    to: u8
+}
+
+impl Move {
+    fn parse(line: &str) -> Self { // TODO: parse without regex
+        
+        if let Some(captures) = MOVE_REGEX.captures(line) {
+
+            debug_assert_eq!(captures.len(), 4);
+
+            return Self { 
+                count: captures.get(1).unwrap().as_str().parse::<u8>().unwrap(), // TODO: yuck
+                from: captures.get(2).unwrap().as_str().parse::<u8>().unwrap(),
+                to: captures.get(3).unwrap().as_str().parse::<u8>().unwrap() }
+
+        } else {
+            panic!("Unexpected move format");
+        }
+    }
+}
+
 fn split_by_empty(content: &String) -> (Strings, Strings) {
 
     let mut first: Strings = Vec::new();
@@ -54,42 +85,62 @@ fn extract_stacks(stacks_data: &mut Strings) -> Vec<Stack> {
     return stacks;
 }
 
-fn prepare_data(content: &String) {
+fn extract_moves(moves_data: &Strings) -> Vec<Move> { // TODO: do with CUDA?
 
-    let (mut stacks_data, _moves_data) = split_by_empty(content);
+    // string like `move 1 from 2 to 1`
+    return moves_data.iter()
+            .map(|line| Move::parse(line))
+            .collect()
+}
 
-    let _stacks = extract_stacks(&mut stacks_data); // TODO: avoid mutability
-    // // get number of stacks from string like: ` 1   2   3 `
-    // // three chars per column + one space char between columns,
-    // // so it's four chars per column
-    // // the last column doesn't have a separator, so "emulate" it
-    // let line_with_numbers = stacks_data.pop().unwrap();
-    // let stacks_count = (line_with_numbers.len() + 1) / 4;
+fn prepare_data(content: &String) -> (Vec<Stack>, Vec<Move>) {
 
-    // stacks_data.reverse();
+    let (mut stacks_data, moves_data) = split_by_empty(content);
 
-    // let mut stacks: Vec<Stack> = Vec::with_capacity(stacks_count);
+    let stacks = extract_stacks(&mut stacks_data); // TODO: avoid mutability of input
+    let moves = extract_moves(& moves_data);
 
-    // for i in 0..stacks_count {
+    return (stacks, moves);
+}
 
-    //     // get letter from string like `[Z] [M] [P]`
-    //     let letter_index = i * 4 + 1;
-    //     let curr_stack = &mut stacks[i];
+fn part_1(content: &String) -> String {
 
-    //     for line in stacks_data.iter() {
-    //         let crate_name = line.as_bytes()[letter_index] as char;
-    //         if crate_name == ' ' { break; } // stack ended
+    let (mut stacks, moves) = prepare_data(&content);
 
-    //         curr_stack.push(crate_name);
-    //     }
-    // }
+    for m in moves {
 
+        // TODO: now addressing required stack is done in the loop, because:
+        // - cannot borrow two stacks at once
+        // - tricky way to have immutable vector of mutable vectors
+
+        // let from_stack = &mut stacks[(m.from - 1) as usize];
+        // let to_stack = &mut stacks[(m.to - 1) as usize];
+
+        for _i in 0..m.count {
+            let top = stacks[(m.from - 1) as usize].pop();
+            if top.is_some() {
+                stacks[(m.to - 1) as usize].push(top.unwrap());
+            }
+            // to_stack.push(from_stack.pop().unwrap());
+        }
+    }
+
+    let mut result = String::new();
+    for mut s in stacks {
+        let top = s.pop();
+        if top.is_some() {
+            result.push(top.unwrap());
+        }
+    }
+
+    return result;
 }
 
 fn main() -> std::io::Result<()> {
 
     let content = utils::load_data()?;
-    prepare_data(&content);
+    let result1 = part_1(&content);
+    println!("1) Tops are {}", result1);
 
     Ok(())
 }
@@ -125,5 +176,13 @@ mod tests {
         assert_eq!(stacks[0], Vec::from(['Z', 'N']));
         assert_eq!(stacks[1], Vec::from(['M', 'C', 'D']));
         assert_eq!(stacks[2], Vec::from(['P']));
+    }
+
+    #[test]
+    fn move_parse() {
+        let m = Move::parse("move 19 from 2 to 1");
+        assert_eq!(m.count, 19);
+        assert_eq!(m.from, 2);
+        assert_eq!(m.to, 1);
     }
 }
