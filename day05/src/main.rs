@@ -11,7 +11,7 @@ lazy_static! {
 }
 
 struct Move {
-    count: u8,
+    count: usize,
     from: u8,
     to: u8
 }
@@ -24,7 +24,7 @@ impl Move {
             debug_assert_eq!(captures.len(), 4);
 
             return Self { 
-                count: captures.get(1).unwrap().as_str().parse::<u8>().unwrap(), // TODO: yuck
+                count: captures.get(1).unwrap().as_str().parse::<usize>().unwrap(), // TODO: yuck
                 from: captures.get(2).unwrap().as_str().parse::<u8>().unwrap(),
                 to: captures.get(3).unwrap().as_str().parse::<u8>().unwrap() }
 
@@ -115,6 +115,8 @@ fn get_top_letters(stacks: &Vec<Stack>) -> String {
     return result;
 }
 
+type MoveFn = fn(Move, &mut Vec<Stack>);
+
 fn reverse_move(m: Move, stacks: &mut Vec<Stack>) {
 
     // TODO: now addressing required stack is done in the loop, because:
@@ -134,13 +136,31 @@ fn reverse_move(m: Move, stacks: &mut Vec<Stack>) {
     }
 }
 
-fn part_1(content: &String) -> String {
+fn block_move(m: Move, stacks: &mut Vec<Stack>) {
+
+    // TODO: now addressing required stack is done in the loop, because:
+    // - cannot borrow two stacks at once
+    // - tricky way to have immutable vector of mutable vectors
+
+    // let from_stack = &mut stacks[(m.from - 1) as usize];
+    // let to_stack = &mut stacks[(m.to - 1) as usize];
+
+    let from = (m.from - 1) as usize;
+    let to = (m.to - 1) as usize;
+
+    let len = stacks[from].len();
+    let block = stacks[from].split_off(len - m.count);
+
+    stacks[to].extend(block);
+}
+
+fn run_part(content: &String, move_operation: MoveFn) -> String {
 
     let (mut stacks, moves) = prepare_data(&content);
 
     for m in moves {
 
-        reverse_move(m, &mut stacks);
+        move_operation(m, &mut stacks);
     }
 
     return get_top_letters(&stacks);
@@ -149,8 +169,12 @@ fn part_1(content: &String) -> String {
 fn main() -> std::io::Result<()> {
 
     let content = utils::load_data()?;
-    let result1 = part_1(&content);
+
+    let result1 = run_part(&content, reverse_move);
     println!("1) Tops are {}", result1);
+
+    let result2 = run_part(&content, block_move);
+    println!("2) Tops are {}", result2);
 
     Ok(())
 }
@@ -208,6 +232,40 @@ mod tests {
 
         let result = get_top_letters(&stacks);
         assert_eq!(result, "NDP");
+    }
+
+    #[test]
+    fn check_reverse_move() {
+        let mut input = vec![
+        "    [D]    ",
+        "[N] [C]    ",
+        "[Z] [M] [P]",
+        " 1   2   3 "
+        ];
+        let mut stacks = extract_stacks(&mut input);
+
+        let m = Move { count: 2, from: 2, to: 3 };
+        reverse_move(m, &mut stacks);
+
+        let result = get_top_letters(&stacks);
+        assert_eq!(result, "NMC");
+    }
+
+    #[test]
+    fn check_block_move() {
+        let mut input = vec![
+        "    [D]    ",
+        "[N] [C]    ",
+        "[Z] [M] [P]",
+        " 1   2   3 "
+        ];
+        let mut stacks = extract_stacks(&mut input);
+
+        let m = Move { count: 2, from: 2, to: 3 };
+        block_move(m, &mut stacks);
+
+        let result = get_top_letters(&stacks);
+        assert_eq!(result, "NMD");
     }
 
 }
