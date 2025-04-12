@@ -103,7 +103,7 @@ fn prepare_data(content: &String) -> (Vec<Stack>, Vec<Move>) {
     return (stacks, moves);
 }
 
-fn get_top_letters(stacks: Vec<Stack>) -> String {
+fn get_top_letters(stacks: &Vec<Stack>) -> String {
     let mut result = String::new();
     for s in stacks {
 
@@ -115,31 +115,35 @@ fn get_top_letters(stacks: Vec<Stack>) -> String {
     return result;
 }
 
+fn reverse_move(m: Move, stacks: &mut Vec<Stack>) {
+
+    // TODO: now addressing required stack is done in the loop, because:
+    // - cannot borrow two stacks at once
+    // - tricky way to have immutable vector of mutable vectors
+
+    // let from_stack = &mut stacks[(m.from - 1) as usize];
+    // let to_stack = &mut stacks[(m.to - 1) as usize];
+
+    let from = (m.from - 1) as usize;
+    let to = (m.to - 1) as usize;
+
+    for _ in 0..m.count {
+        if let Some(top) = stacks[from].pop() {
+            stacks[to].push(top);
+        }
+    }
+}
+
 fn part_1(content: &String) -> String {
 
     let (mut stacks, moves) = prepare_data(&content);
 
     for m in moves {
 
-        // TODO: now addressing required stack is done in the loop, because:
-        // - cannot borrow two stacks at once
-        // - tricky way to have immutable vector of mutable vectors
-
-        // let from_stack = &mut stacks[(m.from - 1) as usize];
-        // let to_stack = &mut stacks[(m.to - 1) as usize];
-
-        let from = (m.from - 1) as usize;
-        let to = (m.to - 1) as usize;
-
-        for _i in 0..m.count {
-            if let Some(top) = stacks[from].pop() {
-                stacks[to].push(top);
-            }
-            // to_stack.push(from_stack.pop().unwrap());
-        }
+        reverse_move(m, &mut stacks);
     }
 
-    return get_top_letters(stacks);
+    return get_top_letters(&stacks);
 }
 
 fn main() -> std::io::Result<()> {
@@ -202,7 +206,7 @@ mod tests {
         ];
         let stacks = extract_stacks(&mut input);
 
-        let result = get_top_letters(stacks);
+        let result = get_top_letters(&stacks);
         assert_eq!(result, "NDP");
     }
 
