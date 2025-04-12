@@ -103,6 +103,18 @@ fn prepare_data(content: &String) -> (Vec<Stack>, Vec<Move>) {
     return (stacks, moves);
 }
 
+fn get_top_letters(stacks: Vec<Stack>) -> String {
+    let mut result = String::new();
+    for s in stacks {
+
+        if let Some(top) = s.last() {
+            result.push(*top);
+        }
+    }
+
+    return result;
+}
+
 fn part_1(content: &String) -> String {
 
     let (mut stacks, moves) = prepare_data(&content);
@@ -125,15 +137,7 @@ fn part_1(content: &String) -> String {
         }
     }
 
-    let mut result = String::new();
-    for mut s in stacks {
-        let top = s.pop();
-        if top.is_some() {
-            result.push(top.unwrap());
-        }
-    }
-
-    return result;
+    return get_top_letters(stacks);
 }
 
 fn main() -> std::io::Result<()> {
@@ -185,4 +189,19 @@ mod tests {
         assert_eq!(m.from, 2);
         assert_eq!(m.to, 1);
     }
+
+    #[test]
+    fn top_letters() {
+        let mut input = vec![
+        "    [D]    ",
+        "[N] [C]    ",
+        "[Z] [M] [P]",
+        " 1   2   3 "
+        ];
+        let stacks = extract_stacks(&mut input);
+
+        let result = get_top_letters(stacks);
+        assert_eq!(result, "NDP");
+    }
+
 }
