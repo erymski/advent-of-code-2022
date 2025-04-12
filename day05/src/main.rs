@@ -128,10 +128,12 @@ fn part_1(content: &String) -> String {
         // let from_stack = &mut stacks[(m.from - 1) as usize];
         // let to_stack = &mut stacks[(m.to - 1) as usize];
 
+        let from = (m.from - 1) as usize;
+        let to = (m.to - 1) as usize;
+
         for _i in 0..m.count {
-            let top = stacks[(m.from - 1) as usize].pop();
-            if top.is_some() {
-                stacks[(m.to - 1) as usize].push(top.unwrap());
+            if let Some(top) = stacks[from].pop() {
+                stacks[to].push(top);
             }
             // to_stack.push(from_stack.pop().unwrap());
         }
