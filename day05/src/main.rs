@@ -55,15 +55,18 @@ fn split_by_empty(content: &String) -> (Strings, Strings) {
     return (first, second)
 }
 
-fn extract_stacks(stacks_data: &mut Strings) -> Vec<Stack> {
+fn extract_stacks(stacks_data: &Strings) -> Vec<Stack> {
+
+    let len = stacks_data.len();
+    let (stack_content, stack_indexes) = stacks_data.split_at(len - 1);
+    debug_assert!(stack_indexes.len() == 1);
+
     // get number of stacks from string like: ` 1   2   3 `
     // three chars per column + one space char between columns,
     // so it's four chars per column
     // the last column doesn't have a separator, so "emulate" it
-    let line_with_numbers = stacks_data.pop().unwrap();
+    let line_with_numbers = stack_indexes[0];
     let stacks_count = (line_with_numbers.len() + 1) / 4;
-
-    stacks_data.reverse();
 
     let mut stacks: Vec<Stack> = Vec::with_capacity(stacks_count);
 
@@ -74,7 +77,7 @@ fn extract_stacks(stacks_data: &mut Strings) -> Vec<Stack> {
         stacks.push(Vec::new());
         let curr_stack = &mut stacks[i];
 
-        for line in stacks_data.iter() {
+        for line in stack_content.iter().rev() {
             let crate_name = line.as_bytes()[letter_index] as char;
             if crate_name == ' ' { break; } // stack ended
 
@@ -95,9 +98,9 @@ fn extract_moves(moves_data: &Strings) -> Vec<Move> { // TODO: do with CUDA?
 
 fn prepare_data(content: &String) -> (Vec<Stack>, Vec<Move>) {
 
-    let (mut stacks_data, moves_data) = split_by_empty(content);
+    let (stacks_data, moves_data) = split_by_empty(content);
 
-    let stacks = extract_stacks(&mut stacks_data); // TODO: avoid mutability of input
+    let stacks = extract_stacks(&stacks_data);
     let moves = extract_moves(& moves_data);
 
     return (stacks, moves);
@@ -115,9 +118,9 @@ fn get_top_letters(stacks: &Vec<Stack>) -> String {
     return result;
 }
 
-type MoveFn = fn(Move, &mut Vec<Stack>);
+type MoveFn = fn(&Move, &mut Vec<Stack>);
 
-fn reverse_move(m: Move, stacks: &mut Vec<Stack>) {
+fn reverse_move(m: &Move, stacks: &mut Vec<Stack>) {
 
     // TODO: now addressing required stack is done in the loop, because:
     // - cannot borrow two stacks at once
@@ -136,7 +139,7 @@ fn reverse_move(m: Move, stacks: &mut Vec<Stack>) {
     }
 }
 
-fn block_move(m: Move, stacks: &mut Vec<Stack>) {
+fn block_move(m: &Move, stacks: &mut Vec<Stack>) {
 
     // TODO: now addressing required stack is done in the loop, because:
     // - cannot borrow two stacks at once
@@ -149,6 +152,7 @@ fn block_move(m: Move, stacks: &mut Vec<Stack>) {
     let to = (m.to - 1) as usize;
 
     let len = stacks[from].len();
+    debug_assert!(len >= m.count);
     let block = stacks[from].split_off(len - m.count);
 
     stacks[to].extend(block);
@@ -160,7 +164,7 @@ fn run_part(content: &String, move_operation: MoveFn) -> String {
 
     for m in moves {
 
-        move_operation(m, &mut stacks);
+        move_operation(&m, &mut stacks);
     }
 
     return get_top_letters(&stacks);
@@ -197,14 +201,14 @@ mod tests {
 
     #[test]
     fn stacks() {
-        let mut input = vec![
+        let input = vec![
         "    [D]    ",
         "[N] [C]    ",
         "[Z] [M] [P]",
         " 1   2   3 "
         ];
 
-        let stacks = extract_stacks(&mut input);
+        let stacks = extract_stacks(&input);
         assert_eq!(stacks.len(), 3);
 
         assert_eq!(stacks[0], Vec::from(['Z', 'N']));
@@ -245,7 +249,7 @@ mod tests {
         let mut stacks = extract_stacks(&mut input);
 
         let m = Move { count: 2, from: 2, to: 3 };
-        reverse_move(m, &mut stacks);
+        reverse_move(&m, &mut stacks);
 
         let result = get_top_letters(&stacks);
         assert_eq!(result, "NMC");
@@ -262,7 +266,7 @@ mod tests {
         let mut stacks = extract_stacks(&mut input);
 
         let m = Move { count: 2, from: 2, to: 3 };
-        block_move(m, &mut stacks);
+        block_move(&m, &mut stacks);
 
         let result = get_top_letters(&stacks);
         assert_eq!(result, "NMD");
