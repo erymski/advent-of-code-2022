@@ -183,9 +183,22 @@ fn main() -> std::io::Result<()> {
     Ok(())
 }
 
+lazy_static! {
+
+
+}
+    
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    static TEST_CRATES: [&str;4] = [
+        "    [D]    ",
+        "[N] [C]    ",
+        "[Z] [M] [P]",
+        " 1   2   3 "
+        ];
 
     #[test]
     fn split() {
@@ -201,14 +214,7 @@ mod tests {
 
     #[test]
     fn stacks() {
-        let input = vec![
-        "    [D]    ",
-        "[N] [C]    ",
-        "[Z] [M] [P]",
-        " 1   2   3 "
-        ];
-
-        let stacks = extract_stacks(&input);
+        let stacks = extract_stacks(&Vec::from(TEST_CRATES));
         assert_eq!(stacks.len(), 3);
 
         assert_eq!(stacks[0], Vec::from(['Z', 'N']));
@@ -226,13 +232,8 @@ mod tests {
 
     #[test]
     fn top_letters() {
-        let mut input = vec![
-        "    [D]    ",
-        "[N] [C]    ",
-        "[Z] [M] [P]",
-        " 1   2   3 "
-        ];
-        let stacks = extract_stacks(&mut input);
+
+        let stacks = extract_stacks(&Vec::from(TEST_CRATES));
 
         let result = get_top_letters(&stacks);
         assert_eq!(result, "NDP");
@@ -240,13 +241,8 @@ mod tests {
 
     #[test]
     fn check_reverse_move() {
-        let mut input = vec![
-        "    [D]    ",
-        "[N] [C]    ",
-        "[Z] [M] [P]",
-        " 1   2   3 "
-        ];
-        let mut stacks = extract_stacks(&mut input);
+
+        let mut stacks = extract_stacks(&Vec::from(TEST_CRATES));
 
         let m = Move { count: 2, from: 2, to: 3 };
         reverse_move(&m, &mut stacks);
@@ -257,13 +253,7 @@ mod tests {
 
     #[test]
     fn check_block_move() {
-        let mut input = vec![
-        "    [D]    ",
-        "[N] [C]    ",
-        "[Z] [M] [P]",
-        " 1   2   3 "
-        ];
-        let mut stacks = extract_stacks(&mut input);
+        let mut stacks = extract_stacks(&Vec::from(TEST_CRATES));
 
         let m = Move { count: 2, from: 2, to: 3 };
         block_move(&m, &mut stacks);
