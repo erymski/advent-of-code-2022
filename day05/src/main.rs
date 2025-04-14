@@ -17,7 +17,8 @@ struct Move {
 }
 
 impl Move {
-    fn parse(line: &str) -> Self { // TODO: parse without regex
+    #![allow(dead_code)]
+    fn parse_with_regex(line: &str) -> Self {
         
         if let Some(captures) = MOVE_REGEX.captures(line) {
 
@@ -31,6 +32,32 @@ impl Move {
         } else {
             panic!("Unexpected move format");
         }
+    }
+
+    fn parse_natively(line: &str) -> Self {
+        // parsing line like `move 19 from 2 to 1`
+        let mut is_digit = false;
+        let mut index: usize = 0;
+        let mut arr: [u32; 3] = [0, 0, 0];
+
+        for ch in line.chars() {
+
+            if let Some(digit) = ch.to_digit(10) {
+                arr[index] *= 10;
+                arr[index] += digit;
+
+                is_digit = true;
+
+            } else {
+                if is_digit {
+                    is_digit = false;
+                    index += 1;
+                }
+            }
+        }
+
+        debug_assert!(index == 2);
+        return Self { count: arr[0] as usize, from: arr[1] as u8, to: arr[2] as u8 };
     }
 }
 
@@ -92,7 +119,7 @@ fn extract_moves(moves_data: &Strings) -> Vec<Move> { // TODO: do with CUDA?
 
     // string like `move 1 from 2 to 1`
     return moves_data.iter()
-            .map(|line| Move::parse(line))
+            .map(|line| Move::parse_natively(line))
             .collect()
 }
 
@@ -223,8 +250,16 @@ mod tests {
     }
 
     #[test]
-    fn move_parse() {
-        let m = Move::parse("move 19 from 2 to 1");
+    fn move_parse_with_regex() {
+        let m = Move::parse_with_regex("move 19 from 2 to 1");
+        assert_eq!(m.count, 19);
+        assert_eq!(m.from, 2);
+        assert_eq!(m.to, 1);
+    }
+
+    #[test]
+    fn move_parse_natively() {
+        let m = Move::parse_natively("move 19 from 2 to 1");
         assert_eq!(m.count, 19);
         assert_eq!(m.from, 2);
         assert_eq!(m.to, 1);
