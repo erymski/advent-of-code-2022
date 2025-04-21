@@ -1,10 +1,12 @@
+#![allow(unused)]
+
 use utils;
+use rayon::prelude::*;
+use lazy_static::lazy_static;
+use regex::Regex;
 
 type Strings<'a> = Vec<&'a str>;
 type Stack = Vec<char>;
-
-use lazy_static::lazy_static;
-use regex::Regex;
 
 lazy_static! {
     static ref MOVE_REGEX: Regex = Regex::new(r"move (\d*) from (\d*) to (\d*)").unwrap();
@@ -17,7 +19,6 @@ struct Move {
 }
 
 impl Move {
-    #![allow(dead_code)]
     fn parse_with_regex(line: &str) -> Self {
         
         if let Some(captures) = MOVE_REGEX.captures(line) {
@@ -115,20 +116,44 @@ fn extract_stacks(stacks_data: &Strings) -> Vec<Stack> {
     return stacks;
 }
 
-fn extract_moves(moves_data: &Strings) -> Vec<Move> { // TODO: do with CUDA?
+/// Parse moves one-by-one
+fn extract_moves_simple(moves_data: &Strings) -> Vec<Move> { // TODO: do with CUDA?
 
-    // string like `move 1 from 2 to 1`
     return moves_data.iter()
             .map(|line| Move::parse_natively(line))
             .collect()
 }
+
+/// Parse moves in parallel threads with Rayon iterator
+fn extract_moves_parallel_iter(moves_data: &Strings) -> Vec<Move> {
+
+    return moves_data.par_iter()
+            .map(|line| Move::parse_natively(line))
+            .collect()
+}
+
+/// Parse moves in parallel threads with Rayon iterator
+/// TODO: doesn't work because of 'cannot borrow `output` as mutable, as it is a captured variable in a `Fn` closure'
+// fn extract_moves_parallel_index(moves_data: &Strings) -> Vec<Move> {
+
+//     let len = moves_data.len();
+//     let mut output: Vec<Move> = Vec::with_capacity(len);
+
+//     (0..len).into_par_iter().for_each(|i| {
+//         output[i] = Move::parse_natively(moves_data[i]);
+//     });
+
+//     return output;
+// }
+
+
 
 fn prepare_data(content: &String) -> (Vec<Stack>, Vec<Move>) {
 
     let (stacks_data, moves_data) = split_by_empty(content);
 
     let stacks = extract_stacks(&stacks_data);
-    let moves = extract_moves(& moves_data);
+    let moves = extract_moves_parallel_iter(& moves_data);
 
     return (stacks, moves);
 }
@@ -206,6 +231,9 @@ fn main() -> std::io::Result<()> {
 
     let result2 = run_part(&content, block_move);
     println!("2) Tops are {}", result2);
+
+    let n_threads = rayon::current_num_threads();
+    println!("(Rayon is using {} threads)", n_threads);
 
     Ok(())
 }
