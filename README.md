@@ -4,6 +4,7 @@ Using [Advent of Code 2022](https://adventofcode.com/2022/about) as a chance to 
 
 ## To not forget
 
+* Execute project as `cargo run -p day01 -- day01/data/input.txt`
 * Run Clippy to perform official linting (like - `cargo clippy -p day03`)
 
 ## Copilot prompt

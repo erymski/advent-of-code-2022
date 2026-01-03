@@ -1,16 +1,18 @@
 use std::collections::BinaryHeap;
 use std::cmp::Reverse;
 
+const SEPARATOR: i32 = -1;
+
 // find result in a *single* pass:
 //   go line by line.  Detect Elf changes.  Track the one with the biggest sum.
-fn first_half(lines: &[&str]) {
+fn first_half(series: &[i32]) -> (i32, i32) {
     let mut curr_sum: i32 = 0;
     let mut curr_index: i32 = 0;
     let mut biggest_index: i32 = -1;
     let mut biggest_sum: i32 = -1;
 
-    for line in lines {
-        if line.is_empty() {
+    for &num in series {
+        if num == SEPARATOR {
             if curr_sum > biggest_sum {
                 biggest_index = curr_index;
                 biggest_sum = curr_sum;
@@ -19,42 +21,98 @@ fn first_half(lines: &[&str]) {
             curr_sum = 0;
             curr_index += 1;
         } else {
-            curr_sum += str::parse::<i32>(line).unwrap();
+            curr_sum += num;
         }
     }
 
-    println!("1) Found: index: {}, sum: {}", biggest_index, biggest_sum);
+    if curr_sum > biggest_sum {
+        biggest_index = curr_index;
+        biggest_sum = curr_sum;
+    }
+
+    return (biggest_index, biggest_sum);
 }
 
-fn second_half(lines: &[&str]) {
+fn second_half(series: &[i32]) -> i32 {
 
     let mut heap = BinaryHeap::new();
-    let mut current_sum = 0;
 
-    // make array with sums
-    for line in lines {
-        if line.is_empty() {
-            heap.push(Reverse(current_sum));
-            if heap.len() > 3 {
-                heap.pop();
-            }
+    let mut update_heap = |value: i32| {
+        heap.push(Reverse(value));
+        if heap.len() > 3 {
+            heap.pop();
+        }
+    };
+
+    let mut current_sum = 0;
+    for &num in series {
+        if num == SEPARATOR {
+            update_heap(current_sum);
             current_sum = 0;
         } else {
-            current_sum += str::parse::<i32>(line).unwrap();
+            current_sum += num;
         }
     }
 
-    let res: i32 = heap.iter().map(|Reverse(val)| val).sum();
+    update_heap(current_sum);
 
-    println!("2) Sum of top three: {}", res);
+    let res: i32 = heap.iter().map(|Reverse(val)| val).sum();
+    return res;
 }
 
 fn main() -> std::io::Result<()> {
     let content = utils::load_data()?;
-    let lines: Vec<&str> = content.lines().collect();
+    let series: Vec<i32> = content.lines().map(|l| if l.is_empty() { SEPARATOR } else { l.parse().unwrap() }).collect();
 
-    first_half(&lines);
-    second_half(&lines);
+    let (biggest_index, biggest_sum) = first_half(&series);
+    println!("1) Found: index: {}, sum: {}", biggest_index, biggest_sum);
+
+    let res = second_half(&series);
+    println!("2) Sum of top three: {}", res);
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_first_half_basic() {
+        let series = vec![100, 200, SEPARATOR, 300, SEPARATOR, 50, 150];
+        let (index, sum) = first_half(&series);
+        assert_eq!(index, 0);
+        assert_eq!(sum, 300);
+    }
+
+    #[test]
+    fn test_first_half_single_elf() {
+        let series = vec![100, 200];
+        let (index, sum) = first_half(&series);
+        assert_eq!(index, 0);
+        assert_eq!(sum, 300);
+    }
+
+    #[test]
+    fn test_first_half_last_is_max() {
+        let series = vec![100, SEPARATOR, 200, 300];
+        let (index, sum) = first_half(&series);
+        assert_eq!(index, 1);
+        assert_eq!(sum, 500);
+    }
+
+    #[test]
+    fn test_second_half_basic() {
+        let series = vec![100, 200, SEPARATOR, 300, SEPARATOR, 50, 150, SEPARATOR, 400];
+        let sum = second_half(&series);
+        assert_eq!(sum, 1000); // 400 + 300 + 300
+    }
+
+
+    #[test]
+    fn test_second_half_single_large() {
+        let series = vec![1000, SEPARATOR, 100, SEPARATOR, 200];
+        let sum = second_half(&series);
+        assert_eq!(sum, 1300); // 1000 + 200 + 100
+    }
 }
