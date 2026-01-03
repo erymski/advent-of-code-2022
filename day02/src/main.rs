@@ -29,8 +29,6 @@ fn first_half(pairs: &[(u8, u8)]) -> u32 {
         let round_pts = game_points(opponent_move, my_move);
         points += round_pts;
         points += my_move as u32;
-
-        //        println!("{} vs {} => {} + {}", opponent_move, my_move, round_pts, my_move);
     }
 
     return points;
@@ -74,11 +72,9 @@ fn main() -> std::io::Result<()> {
     let content = utils::load_data()?;
     let pairs: Vec<(u8, u8)> = load(&content);
 
-    // let it = "A Y\nB X\nC Z".lines();
     let pts1: u32 = first_half(&pairs);
     println!("1) Total points {}", pts1);
 
-    //second_half("A Y\nB X\nC Z".lines());
     let pts2: u32 = second_half(&pairs);
     println!("2) Total points {}", pts2);
 
@@ -103,4 +99,29 @@ mod tests {
         let points: u32 = second_half(&pairs);
         assert_eq!(points, 12)
     }
+
+    #[test]
+    fn test_choose_my_move_lose() {
+        assert_eq!(choose_my_move(ROCK, LOSE), SCISSORS, "For LOSE against ROCK, expected SCISSORS");
+        assert_eq!(choose_my_move(PAPER, LOSE), ROCK, "For LOSE against PAPER, expected ROCK");
+        assert_eq!(choose_my_move(SCISSORS, LOSE), PAPER, "For LOSE against SCISSORS, expected PAPER");
+    }
+
+    #[test]
+    fn test_choose_my_move_win() {
+        assert_eq!(choose_my_move(ROCK, WIN), PAPER, "For WIN against ROCK, expected PAPER");
+        assert_eq!(choose_my_move(PAPER, WIN), SCISSORS, "For WIN against PAPER, expected SCISSORS");
+        assert_eq!(choose_my_move(SCISSORS, WIN), ROCK, "For WIN against SCISSORS, expected ROCK");
+    }
+
+    #[test]
+    fn test_choose_my_move_draw() {
+
+        const DRAW: u8 = b'Y';
+
+        assert_eq!(choose_my_move(ROCK, DRAW), ROCK);
+        assert_eq!(choose_my_move(PAPER, DRAW), PAPER);
+        assert_eq!(choose_my_move(SCISSORS, DRAW), SCISSORS);
+    }
+
 }
