@@ -1,6 +1,9 @@
+use std::collections::BinaryHeap;
+use std::cmp::Reverse;
+
 // find result in a *single* pass:
 //   go line by line.  Detect Elf changes.  Track the one with the biggest sum.
-fn first_half(lines: &Vec<&str>) {
+fn first_half(lines: &[&str]) {
     let mut curr_sum: i32 = 0;
     let mut curr_index: i32 = 0;
     let mut biggest_index: i32 = -1;
@@ -23,24 +26,25 @@ fn first_half(lines: &Vec<&str>) {
     println!("1) Found: index: {}, sum: {}", biggest_index, biggest_sum);
 }
 
-fn second_half(lines: &Vec<&str>) {
-    let mut vec: Vec<i32> = vec![0];
-    let mut index: usize = 0;
+fn second_half(lines: &[&str]) {
+
+    let mut heap = BinaryHeap::new();
+    let mut current_sum = 0;
 
     // make array with sums
     for line in lines {
         if line.is_empty() {
-            index += 1;
-            vec.push(0);
+            heap.push(Reverse(current_sum));
+            if heap.len() > 3 {
+                heap.pop();
+            }
+            current_sum = 0;
         } else {
-            vec[index] += str::parse::<i32>(line).unwrap();
+            current_sum += str::parse::<i32>(line).unwrap();
         }
     }
 
-    // sort the resulting array and sum up the last three items
-    vec.sort();
-    let last3 = &vec[vec.len() - 3..];
-    let res: i32 = last3.iter().sum();
+    let res: i32 = heap.iter().map(|Reverse(val)| val).sum();
 
     println!("2) Sum of top three: {}", res);
 }
