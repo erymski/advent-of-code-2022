@@ -1,5 +1,3 @@
-use utils;
-
 // find result in a *single* pass:
 //   go line by line.  Detect Elf changes.  Track the one with the biggest sum.
 fn first_half(lines: &Vec<&str>) {
