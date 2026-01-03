@@ -6,29 +6,33 @@ const SEPARATOR: i32 = -1;
 // find result in a *single* pass:
 //   go line by line.  Detect Elf changes.  Track the one with the biggest sum.
 fn first_half(series: &[i32]) -> (i32, i32) {
+
     let mut curr_sum: i32 = 0;
     let mut curr_index: i32 = 0;
     let mut biggest_index: i32 = -1;
     let mut biggest_sum: i32 = -1;
 
+    let mut process = |sum: i32, index: i32| {
+        if sum > biggest_sum {
+            biggest_index = index;
+            biggest_sum = sum;
+        }
+    };
+
     for &num in series {
         if num == SEPARATOR {
-            if curr_sum > biggest_sum {
-                biggest_index = curr_index;
-                biggest_sum = curr_sum;
-            }
+
+            process(curr_sum, curr_index);
 
             curr_sum = 0;
             curr_index += 1;
+
         } else {
             curr_sum += num;
         }
     }
 
-    if curr_sum > biggest_sum {
-        biggest_index = curr_index;
-        biggest_sum = curr_sum;
-    }
+    process(curr_sum, curr_index);
 
     return (biggest_index, biggest_sum);
 }
