@@ -1,5 +1,3 @@
-use utils;
-
 #[derive(PartialEq, Eq, Debug)]
 struct Range {
     from: u8,

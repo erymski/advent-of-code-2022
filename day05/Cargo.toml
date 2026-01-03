@@ -1,6 +1,6 @@
 [package]
 name = "day05"
-version = "0.1.3"
+version = "0.1.5"
 edition = "2024"
 
 [dependencies]
@@ -8,3 +8,6 @@ utils = { path = "../utils" }
 regex = "1.11.1"
 lazy_static = "1.5"
 rayon = "1.10.0"
+
+[lints]
+workspace = true

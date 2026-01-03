@@ -1,6 +1,5 @@
 #![allow(unused)]
 
-use utils;
 use rayon::prelude::*;
 use lazy_static::lazy_static;
 use regex::Regex;
@@ -49,11 +48,9 @@ impl Move {
 
                 is_digit = true;
 
-            } else {
-                if is_digit {
-                    is_digit = false;
-                    index += 1;
-                }
+            } else if is_digit {
+                is_digit = false;
+                index += 1;
             }
         }
 
@@ -62,7 +59,7 @@ impl Move {
     }
 }
 
-fn split_by_empty(content: &String) -> (Strings, Strings) {
+fn split_by_empty(content: &str) -> (Strings, Strings) {
 
     let mut first: Strings = Vec::new();
     let mut second: Strings = Vec::new();
@@ -132,8 +129,8 @@ fn extract_moves_parallel_iter(moves_data: &Strings) -> Vec<Move> {
             .collect()
 }
 
-/// Parse moves in parallel threads with Rayon iterator
-/// TODO: doesn't work because of 'cannot borrow `output` as mutable, as it is a captured variable in a `Fn` closure'
+// Parse moves in parallel threads with Rayon iterator
+// TODO: doesn't work because of 'cannot borrow `output` as mutable, as it is a captured variable in a `Fn` closure'
 // fn extract_moves_parallel_index(moves_data: &Strings) -> Vec<Move> {
 
 //     let len = moves_data.len();
@@ -146,9 +143,7 @@ fn extract_moves_parallel_iter(moves_data: &Strings) -> Vec<Move> {
 //     return output;
 // }
 
-
-
-fn prepare_data(content: &String) -> (Vec<Stack>, Vec<Move>) {
+fn prepare_data(content: &str) -> (Vec<Stack>, Vec<Move>) {
 
     let (stacks_data, moves_data) = split_by_empty(content);
 
@@ -158,7 +153,7 @@ fn prepare_data(content: &String) -> (Vec<Stack>, Vec<Move>) {
     return (stacks, moves);
 }
 
-fn get_top_letters(stacks: &Vec<Stack>) -> String {
+fn get_top_letters(stacks: &[Stack]) -> String {
     let mut result = String::new();
     for s in stacks {
 
@@ -170,9 +165,9 @@ fn get_top_letters(stacks: &Vec<Stack>) -> String {
     return result;
 }
 
-type MoveFn = fn(&Move, &mut Vec<Stack>);
+type MoveFn = fn(&Move, &mut [Stack]);
 
-fn reverse_move(m: &Move, stacks: &mut Vec<Stack>) {
+fn reverse_move(m: &Move, stacks: &mut [Stack]) {
 
     // TODO: now addressing required stack is done in the loop, because:
     // - cannot borrow two stacks at once
@@ -191,7 +186,7 @@ fn reverse_move(m: &Move, stacks: &mut Vec<Stack>) {
     }
 }
 
-fn block_move(m: &Move, stacks: &mut Vec<Stack>) {
+fn block_move(m: &Move, stacks: &mut [Stack]) {
 
     // TODO: now addressing required stack is done in the loop, because:
     // - cannot borrow two stacks at once
@@ -210,9 +205,9 @@ fn block_move(m: &Move, stacks: &mut Vec<Stack>) {
     stacks[to].extend(block);
 }
 
-fn run_part(content: &String, move_operation: MoveFn) -> String {
+fn run_part(content: &str, move_operation: MoveFn) -> String {
 
-    let (mut stacks, moves) = prepare_data(&content);
+    let (mut stacks, moves) = prepare_data(content);
 
     for m in moves {
 
