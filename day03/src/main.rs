@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::collections::HashSet;
-use utils;
 
 /// Find common char in both halves of the string
 fn find_shared(line: &str) -> Option<char> {
@@ -16,19 +15,13 @@ fn find_shared(line: &str) -> Option<char> {
         first_half_chars.insert(ch);
     }
 
-    for ch in second.chars() {
-        if first_half_chars.contains(&ch) {
-            return Some(ch);
-        }
-    }
-
-    return None;
+    return second.chars().find(|&ch| first_half_chars.contains(&ch));
 }
 
 /// Convert character to corresponding priority
 fn to_number(ch: char) -> u8 {
-    const A_LOW: u8 = 'a' as u8;
-    const A_UPPER: u8 = 'A' as u8;
+    const A_LOW: u8 = b'a';
+    const A_UPPER: u8 = b'A';
 
     // Lowercase item types a through z have priorities 1 through 26.
     // Uppercase item types A through Z have priorities 27 through 52.
@@ -81,7 +74,7 @@ fn first_part(lines: &Vec<&str>) -> u32 {
         if shared.is_some() {
             sum += to_number(shared.unwrap()) as u32
         } else {
-            debug_assert!(true)
+            panic!()
         }
     }
 
@@ -96,7 +89,7 @@ fn second_part(lines: &Vec<&str>) -> u32 {
         if letter.is_some() {
             sum += to_number(letter.unwrap()) as u32;
         } else {
-            debug_assert!(true)
+            panic!()
         }
     }
 

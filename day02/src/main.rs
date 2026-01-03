@@ -1,7 +1,5 @@
-use utils;
-
-const A: u8 = 'A' as u8;
-const X: u8 = 'X' as u8;
+const A: u8 = b'A';
+const X: u8 = b'X';
 
 const ROCK: u8 = 1;
 const PAPER: u8 = 2;
@@ -38,8 +36,8 @@ fn first_half(lines: &Vec<&str>) -> u32 {
     return points;
 }
 
-const LOSE: u8 = 'X' as u8;
-const WIN: u8 = 'Z' as u8;
+const LOSE: u8 = b'X';
+const WIN: u8 = b'Z';
 
 fn choose_my_move(opponent_move: u8, expected_result: u8) -> u8 {
     // X means you need to lose, Y means you need to end the round in a draw, and Z means you need to win
