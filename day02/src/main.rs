@@ -18,13 +18,13 @@ fn game_points(opponent_move: u8, my_move: u8) -> u32 {
     }
 }
 
-fn first_half(lines: &Vec<&str>) -> u32 {
+fn first_half(pairs: &[(u8, u8)]) -> u32 {
     let mut points: u32 = 0;
 
-    for line in lines {
-        let bytes = line.as_bytes();
-        let opponent_move: u8 = bytes[0] - A + 1;
-        let my_move: u8 = bytes[2] - X + 1;
+    // transform pairs into collection of moves (opponent's, my)
+    let moves = pairs.iter().map(|(first, second)| (first - A + 1, second - X + 1));
+
+    for (opponent_move, my_move) in moves {
 
         let round_pts = game_points(opponent_move, my_move);
         points += round_pts;
@@ -48,34 +48,38 @@ fn choose_my_move(opponent_move: u8, expected_result: u8) -> u8 {
     };
 }
 
-fn second_half(lines: &Vec<&str>) -> u32 {
+fn second_half(pairs: &[(u8, u8)]) -> u32 {
     let mut points: u32 = 0;
 
-    for line in lines {
-        let bytes = line.as_bytes();
-        let opponent_move: u8 = bytes[0] - A + 1;
-        let my_move: u8 = choose_my_move(opponent_move, bytes[2]);
+    for (first, second) in pairs {
+        let opponent_move: u8 = first - A + 1;
+        let my_move: u8 = choose_my_move(opponent_move, *second);
 
         let round_pts = game_points(opponent_move, my_move);
         points += round_pts;
         points += my_move as u32;
-
-        //        println!("{} vs {} => {} + {}", opponent_move, my_move, round_pts, my_move);
     }
 
     return points;
 }
 
+fn load(content: &str) -> Vec<(u8, u8)> {
+    return content
+        .lines()
+        .map(|line| { let bytes = line.as_bytes(); (bytes[0], bytes[2]) })
+        .collect();
+}
+
 fn main() -> std::io::Result<()> {
     let content = utils::load_data()?;
-    let lines: Vec<&str> = content.lines().collect();
+    let pairs: Vec<(u8, u8)> = load(&content);
 
     // let it = "A Y\nB X\nC Z".lines();
-    let pts1: u32 = first_half(&lines);
+    let pts1: u32 = first_half(&pairs);
     println!("1) Total points {}", pts1);
 
     //second_half("A Y\nB X\nC Z".lines());
-    let pts2: u32 = second_half(&lines);
+    let pts2: u32 = second_half(&pairs);
     println!("2) Total points {}", pts2);
 
     Ok(())
@@ -88,15 +92,15 @@ mod tests {
 
     #[test]
     fn test_first_half() {
-        let lines = "A Y\nB X\nC Z".lines().collect();
-        let points: u32 = first_half(&lines);
+        let pairs = load("A Y\nB X\nC Z");
+        let points: u32 = first_half(&pairs);
         assert_eq!(points, 15)
     }
 
     #[test]
     fn test_second_half() {
-        let lines = "A Y\nB X\nC Z".lines().collect();
-        let points: u32 = second_half(&lines);
+        let pairs = load("A Y\nB X\nC Z");
+        let points: u32 = second_half(&pairs);
         assert_eq!(points, 12)
     }
 }

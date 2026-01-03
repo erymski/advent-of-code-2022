@@ -2,6 +2,8 @@
 
 Using [Advent of Code 2022](https://adventofcode.com/2022/about) as a chance to learn Rust.
 
+[![Rust](https://github.com/erymski/advent-of-code-2022/actions/workflows/build-and-test-rust.yml/badge.svg)](https://github.com/erymski/advent-of-code-2022/actions/workflows/build-and-test-rust.yml)
+
 ## To not forget
 
 * Execute project as `cargo run -p day01 -- day01/data/input.txt`
