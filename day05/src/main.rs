@@ -24,7 +24,7 @@ impl Move {
 
             debug_assert_eq!(captures.len(), 4);
 
-            return Self { 
+            Self { 
                 count: captures.get(1).unwrap().as_str().parse::<usize>().unwrap(), // TODO: yuck
                 from: captures.get(2).unwrap().as_str().parse::<u8>().unwrap(),
                 to: captures.get(3).unwrap().as_str().parse::<u8>().unwrap() }
@@ -55,7 +55,7 @@ impl Move {
         }
 
         debug_assert!(index == 2);
-        return Self { count: arr[0] as usize, from: arr[1] as u8, to: arr[2] as u8 };
+        Self { count: arr[0] as usize, from: arr[1] as u8, to: arr[2] as u8 }
     }
 }
 
@@ -77,7 +77,7 @@ fn split_by_empty(content: &str) -> (Strings, Strings) {
         parts[index].push(line);
     }
 
-    return (first, second)
+    (first, second)
 }
 
 fn extract_stacks(stacks_data: &Strings) -> Vec<Stack> {
@@ -110,23 +110,23 @@ fn extract_stacks(stacks_data: &Strings) -> Vec<Stack> {
         }
     }
 
-    return stacks;
+    stacks
 }
 
 /// Parse moves one-by-one
 fn extract_moves_simple(moves_data: &Strings) -> Vec<Move> { // TODO: do with CUDA?
 
-    return moves_data.iter()
-            .map(|line| Move::parse_natively(line))
-            .collect()
+    moves_data.iter()
+        .map(|line| Move::parse_natively(line))
+        .collect()
 }
 
 /// Parse moves in parallel threads with Rayon iterator
 fn extract_moves_parallel_iter(moves_data: &Strings) -> Vec<Move> {
 
-    return moves_data.par_iter()
-            .map(|line| Move::parse_natively(line))
-            .collect()
+    moves_data.par_iter()
+        .map(|line| Move::parse_natively(line))
+        .collect()
 }
 
 // Parse moves in parallel threads with Rayon iterator
@@ -150,7 +150,7 @@ fn prepare_data(content: &str) -> (Vec<Stack>, Vec<Move>) {
     let stacks = extract_stacks(&stacks_data);
     let moves = extract_moves_parallel_iter(& moves_data);
 
-    return (stacks, moves);
+    (stacks, moves)
 }
 
 fn get_top_letters(stacks: &[Stack]) -> String {
@@ -162,7 +162,7 @@ fn get_top_letters(stacks: &[Stack]) -> String {
         }
     }
 
-    return result;
+    result
 }
 
 type MoveFn = fn(&Move, &mut [Stack]);
@@ -214,7 +214,7 @@ fn run_part(content: &str, move_operation: MoveFn) -> String {
         move_operation(&m, &mut stacks);
     }
 
-    return get_top_letters(&stacks);
+    get_top_letters(&stacks)
 }
 
 fn main() -> std::io::Result<()> {

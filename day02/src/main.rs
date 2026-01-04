@@ -7,14 +7,14 @@ const SCISSORS: u8 = 3;
 
 fn game_points(opponent_move: u8, my_move: u8) -> u32 {
     if opponent_move == my_move {
-        return 3;
+        3
     } else {
-        return match (opponent_move, my_move) {
+        match (opponent_move, my_move) {
             (ROCK, PAPER) => 6,
             (PAPER, SCISSORS) => 6,
             (SCISSORS, ROCK) => 6,
             (_, _) => 0,
-        };
+        }
     }
 }
 
@@ -23,10 +23,10 @@ fn first_half(pairs: &[(u8, u8)]) -> u32 {
     // transform pairs into collection of moves (opponent's, my)
     let moves = pairs.iter().map(|(first, second)| (first - A + 1, second - X + 1));
 
-    return moves.map(|(opponent_move, my_move)| {
+    moves.map(|(opponent_move, my_move)| {
         game_points(opponent_move, my_move) + my_move as u32
     })
-    .sum();
+    .sum()
 }
 
 const LOSE: u8 = b'X';
@@ -34,11 +34,11 @@ const WIN: u8 = b'Z';
 
 fn choose_my_move(opponent_move: u8, expected_result: u8) -> u8 {
     // X means you need to lose, Y means you need to end the round in a draw, and Z means you need to win
-    return match expected_result {
+    match expected_result {
         LOSE => (opponent_move + 1) % 3 + 1,
         WIN => (opponent_move) % 3 + 1,
         _ => opponent_move,
-    };
+    }
 }
 
 fn second_half(pairs: &[(u8, u8)]) -> u32 {
@@ -53,14 +53,14 @@ fn second_half(pairs: &[(u8, u8)]) -> u32 {
         points += my_move as u32;
     }
 
-    return points;
+    points
 }
 
 fn load(content: &str) -> Vec<(u8, u8)> {
-    return content
+    content
         .lines()
         .map(|line| { let bytes = line.as_bytes(); (bytes[0], bytes[2]) })
-        .collect();
+        .collect()
 }
 
 fn main() -> std::io::Result<()> {

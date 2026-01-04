@@ -12,7 +12,7 @@ fn find_shared(line: &str) -> Option<char> {
 
     let first_half_chars: HashSet<char> = first.chars().collect();
 
-    return second.chars().find(|&ch| first_half_chars.contains(&ch));
+    second.chars().find(|&ch| first_half_chars.contains(&ch))
 }
 
 /// Convert character to corresponding priority
@@ -35,7 +35,7 @@ fn get_badge_letter(lines: &[&str]) -> Option<char> {
 
     let mut chars_count: HashMap<char, u8> = HashMap::new();
 
-    let mut bit = 1;
+    let mut bit = 1u8;
     for line in lines {
         let trimmed = line.trim();
         if trimmed.is_empty() {
@@ -56,7 +56,7 @@ fn get_badge_letter(lines: &[&str]) -> Option<char> {
         } // expecting three lines
     }
 
-    return None;
+    None
 }
 
 /// Solve first part of the day 3

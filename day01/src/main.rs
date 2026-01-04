@@ -21,7 +21,7 @@ fn first_half(series: &[i32]) -> (usize, i32) {
         }
     }
 
-    return (biggest_index, biggest_sum);
+    (biggest_index, biggest_sum)
 }
 
 fn second_half(series: &[i32]) -> i32 {

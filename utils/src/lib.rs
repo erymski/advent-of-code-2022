@@ -11,5 +11,5 @@ pub fn load_data() -> std::io::Result<String> {
     let filename: &String = &args[1];
     println!("\nIncoming path: {}", filename);
 
-    return fs::read_to_string(filename);
+    fs::read_to_string(filename)
 }

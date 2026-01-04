@@ -8,37 +8,37 @@ impl Range {
     fn new(text: &str) -> Self {
         // no error checks
         let (from, to) = text.split_once("-").unwrap();
-        return Self {
+        Self {
             from: from.parse::<u8>().unwrap(),
             to: to.parse::<u8>().unwrap(),
-        };
+        }
     }
 
     fn contains(&self, other: &Range) -> bool {
-        return self.from <= other.from && self.to >= other.to;
+        self.from <= other.from && self.to >= other.to
     }
 
     fn either_contains(&self, other: &Range) -> bool {
-        return self.contains(other) || other.contains(self);
+        self.contains(other) || other.contains(self)
     }
 
     fn overlap(&self, other: &Range) -> bool {
-        return self.any_inside(other) || other.any_inside(self);
+        self.any_inside(other) || other.any_inside(self)
     }
 
     fn inside(&self, pt: u8) -> bool {
-        return (self.from <= pt) && (pt <= self.to);
+        (self.from <= pt) && (pt <= self.to)
     }
 
     fn any_inside(&self, other: &Range) -> bool {
-        return self.inside(other.from) || self.inside(other.to);
+        self.inside(other.from) || self.inside(other.to)
     }
 }
 
 /// convert string like "83-83,57-89" to pair of Ranges
 fn to_pair(line: &str) -> (Range, Range) {
     let (a, b) = line.split_once(",").unwrap();
-    return (Range::new(a), Range::new(b));
+    (Range::new(a), Range::new(b))
 }
 
 fn main() -> std::io::Result<()> {
