@@ -19,19 +19,14 @@ fn game_points(opponent_move: u8, my_move: u8) -> u32 {
 }
 
 fn first_half(pairs: &[(u8, u8)]) -> u32 {
-    let mut points: u32 = 0;
 
     // transform pairs into collection of moves (opponent's, my)
     let moves = pairs.iter().map(|(first, second)| (first - A + 1, second - X + 1));
 
-    for (opponent_move, my_move) in moves {
-
-        let round_pts = game_points(opponent_move, my_move);
-        points += round_pts;
-        points += my_move as u32;
-    }
-
-    return points;
+    return moves.map(|(opponent_move, my_move)| {
+        game_points(opponent_move, my_move) + my_move as u32
+    })
+    .sum();
 }
 
 const LOSE: u8 = b'X';
