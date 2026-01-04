@@ -10,10 +10,7 @@ fn find_shared(line: &str) -> Option<char> {
 
     let (first, second) = line.split_at(len / 2);
 
-    let mut first_half_chars: HashSet<char> = HashSet::new();
-    for ch in first.chars() {
-        first_half_chars.insert(ch);
-    }
+    let first_half_chars: HashSet<char> = first.chars().collect();
 
     return second.chars().find(|&ch| first_half_chars.contains(&ch));
 }
@@ -63,37 +60,23 @@ fn get_badge_letter(lines: &[&str]) -> Option<char> {
 }
 
 /// Solve first part of the day 3
-fn first_part(lines: &Vec<&str>) -> u32 {
-    let mut sum: u32 = 0;
-    for line in lines {
-        if line.is_empty() {
-            continue;
-        }
+fn first_part(lines: &[&str]) -> u32 {
 
-        let shared = find_shared(line);
-        if shared.is_some() {
-            sum += to_number(shared.unwrap()) as u32
-        } else {
-            panic!()
-        }
-    }
-
-    return sum;
+    lines
+        .iter()
+        .filter(|line| !line.is_empty())
+        .map(|line| find_shared(line).unwrap())
+        .map(|shared| to_number(shared) as u32)
+        .sum()
 }
 
 fn second_part(lines: &Vec<&str>) -> u32 {
-    let mut sum: u32 = 0;
 
-    for triple in lines.chunks(3) {
-        let letter = get_badge_letter(triple);
-        if letter.is_some() {
-            sum += to_number(letter.unwrap()) as u32;
-        } else {
-            panic!()
-        }
-    }
-
-    return sum;
+    lines
+        .chunks(3)
+        .map(|triple| get_badge_letter(triple).unwrap())
+        .map(|letter| to_number(letter) as u32)
+        .sum()
 }
 
 fn main() -> std::io::Result<()> {
