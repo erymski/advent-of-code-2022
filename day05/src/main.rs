@@ -154,15 +154,11 @@ fn prepare_data(content: &str) -> (Vec<Stack>, Vec<Move>) {
 }
 
 fn get_top_letters(stacks: &[Stack]) -> String {
-    let mut result = String::new();
-    for s in stacks {
 
-        if let Some(top) = s.last() {
-            result.push(*top);
-        }
-    }
-
-    result
+    stacks
+        .iter()
+        .filter_map(|stack| stack.last())
+        .collect()
 }
 
 type MoveFn = fn(&Move, &mut [Stack]);
